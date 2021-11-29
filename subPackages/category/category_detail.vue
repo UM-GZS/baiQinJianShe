@@ -11,12 +11,13 @@
 				<view class="desc_item">直营车辆</view>
 				<view class="desc_item">分期</view>
 			</view> -->
-			<view class="title">
-				{{ detailData.name }}
+			<view class="title flex flex_middle">
+				<text>{{ detailData.name }}</text>
+				<text>已售 {{ detailData.sales }}</text>
 			</view>
 		</view>
 		<!-- 运费 -->
-		<view class="freight">
+		<!-- <view class="freight">
 			<view class="post">
 				<view>运费</view>
 				<view class="freight_price">无需运费</view>
@@ -25,10 +26,10 @@
 				<view>已售</view>
 				<view class="count">{{ detailData.sales }}</view>
 			</view>
-		</view>
+		</view> -->
 		<!-- 服务 -->
 		<view class="service">
-			<view class="delivery">
+			<!-- <view class="delivery">
 				<view>
 					<text style="color: #b5b5b5;">服务</text>
 					<text style="margin-left: 15rpx;">送货上门 48小时内发货</text>
@@ -36,7 +37,7 @@
 				<view>
 					<image src="../../static/index/more.png" style="width: 20rpx;height: 30rpx;"></image>
 				</view>
-			</view>
+			</view> -->
 			<view class="delivery"  @click="buyNow">
 				<view>
 					<text style="color: #b5b5b5;">选择</text>
@@ -64,18 +65,18 @@
 		</view>
 		<!-- 底部按钮 -->
 		<view class="footer">
-			<view class="collect common" v-if="order_types != 0" @click.stop="collect">
+			<!-- <view class="collect common" v-if="order_types != 0" @click.stop="collect">
 				<image src="../../static/user/collaction.png" style="width: 45rpx; height: 45rpx;" v-if="isCollect"></image>
 				<image src="../../static/uview/common/collect.png" style="width: 45rpx; height: 45rpx;" v-else></image>
 				<text>收藏</text>
-			</view>
-			<button open-type="contact" class="contact common" style="margin-left: 30rpx;">
+			</view> -->
+			<!-- <button open-type="contact" class="contact common" style="margin-left: 30rpx;">
 				<image src="../../static/index/server.png" style="width: 50rpx; height: 50rpx;"></image>
 				<text>客服</text>
-			</button>
+			</button> -->
 			<view class="buttom">
-				<view class="collect" @click="collectNow">加入购物车</view>
-				<view class="buy" @click="buyNow">立刻购买</view>
+				<view class="collect" @click="collectNow">加入需求清单</view>
+				<view class="buy" @click="buyNow">立刻下单</view>
 			</view>
 		</view>
 		<!-- 弹出层给用户选择 -->
@@ -84,10 +85,10 @@
 				<view class="rect" @tap.stop>
 					<view class="info">
 						<view class="left">
-							<image :src="url + detailData.small_img_urls" style="width: 100%;height: 100%;"></image>
+							<image :src="currentModel == null ? url + detailData.small_img_urls : url + modelList[currentModel].model_img" style="width: 100%;height: 100%;"></image>
 						</view>
 						<view class="right">
-							<view class="price">￥{{ detailData.price }}</view>
+							<view class="price">￥{{ currentModel == null ? detailData.price : modelList[currentModel].price }}</view>
 							<view class="select_type">
 								<text>已选择</text>
 								<text
@@ -134,7 +135,7 @@
 		data() {
 			return {
 				//! 判断是哪个页面进入当前
-				order_types:'',
+				order_types: '',
 				//! 地址前缀
 				url: getApp().globalData.requesturl,
 				//! 数量
@@ -146,7 +147,7 @@
 				//! 轮播图
 				list: [],
 				//! 通过isCollect来判断用户是否时候收藏当前文章
-				isCollect:null,
+				isCollect: null,
 				// 记录选中的型号下标
 				currentModel: null,
 				//! 当前商品的型号列表
@@ -157,7 +158,7 @@
 					quantity: null // 数量
 				},
 				//! 产品的详情图
-				goodsDetailPic:[],
+				goodsDetailPic: [],
 				isShowCollect: false, // 控制弹窗类型
 				userInfo: getApp().globalData.wxuser,
 			}
@@ -350,6 +351,9 @@
 			},
 			//! 选择型号
 			chooseModel(item, index) {
+				if (!item.inventory) {
+					return getApp().globalData.global_Toast(true, "当前型号没有库存", function(res) {})
+				}
 				this.currentModel = index;
 				// 记录选中商品
 				this.modelData.goods_model = item.name; //!使用商品名称
@@ -368,39 +372,35 @@
 				if (!this.modelData.quantity) {
 					return getApp().globalData.global_Toast(true, "请选择型号数量", function(res) {})
 				}
-				/**
-				 * 计算价格
-				 */
-				// 价格*数量
-				let totalPrice = this.detailData.price * this.modelData.quantity;
-				//! 提取出要发起订单的数据
-				let orderData = {
-					order_types:this.order_types, //! 订单类型(0:新机置换订单,1:租凭订单,2:商品订单)
-					act_pay: totalPrice, //! 商品的总价格
-					quantity: this.modelData.quantity, // 数量
-					items: [{
-						goods_id: this.detailData.id, // 商品id
-						goods_name: this.detailData.name, // 商品名称
-						goods_model: this.modelData.goods_model, // 型号名称
-						img_url: this.detailData.small_img_urls, // 图片
-						price: this.detailData.price, // 商品的单价
-						quantity: this.modelData.quantity, // 数量
-					}],
-				}
 				//! 用户点击下一步时写入将购物车数据写入vuex中
 				if (this.isShowCollect) {
 					let cartDetail = {
 						user_id: this.userInfo.id,
 						goods_id: this.detailData.id,
 						goods_name: this.detailData.name,
-						imgUrl: this.detailData.small_img_urls,
-						price: this.detailData.price,
+						imgUrl: this.modelList[this.currentModel].model_img,
+						price: this.modelList[this.currentModel].price,
 						goods_model: this.modelData.goods_model,
 						quantity: this.modelData.quantity,
 					}
 					const resData = await cartApi.addCart(cartDetail)
 					if (resData.code === 200) return getApp().globalData.global_Toast(true, "该商品已加入购物车", (res) => this.showSelect = false)
 				}else {
+					let totalPrice = this.modelList[this.currentModel].price * this.modelData.quantity;
+					//! 提取出要发起订单的数据
+					let orderData = {
+						order_types:this.order_types, //! 订单类型(0:新机置换订单,1:租凭订单,2:商品订单)
+						act_pay: totalPrice, //! 商品的总价格
+						quantity: this.modelData.quantity, // 数量
+						items: [{
+							goods_id: this.detailData.id, // 商品id
+							goods_name: this.detailData.name, // 商品名称
+							goods_model: this.modelData.goods_model, // 型号名称
+							img_url: this.modelList[this.currentModel].model_img, // 图片
+							price: this.modelList[this.currentModel].price, // 商品的单价
+							quantity: this.modelData.quantity, // 数量
+						}],
+					}
 					this.$store.commit("nextOrder", orderData);
 					this.showSelect = false;
 					uni.navigateTo({
@@ -447,12 +447,18 @@
 
 			.title {
 				width: 100%;
-				font-weight: 700;
-				display: -webkit-box;
-				-webkit-box-orient: vertical;
-				-webkit-line-clamp: 2;
-				font-size: 30rpx;
-				overflow: hidden;
+				color: $black_color;
+				font-size: 24rpx;
+				
+				&>text:nth-child(1) {
+					width: 600rpx;
+					font-size: 30rpx;
+					font-weight: 700;
+					color: #000000;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+				}
 			}
 		}
 
@@ -530,6 +536,7 @@
 			position: fixed;
 			display: flex;
 			align-items: center;
+			justify-content: center;
 			padding: 10rpx 30rpx;
 			left: 0;
 			right: 0;
@@ -562,30 +569,28 @@
 
 			.buttom {
 				height: 100%;
-				margin-left: 30rpx;
-				flex: 1;
+				width: 100%;
 				@include flex-center;
+				justify-content: space-between;
 				font-weight: 500;
 				color: black;
 				font-size: 30rpx;
 				border-radius: 50rpx;
 				
 				&>view {
-					width: 50%;
+					width: 49.5%;
 					height: 100%;
 					line-height: 70rpx;
 					text-align: center;
+					background-color: #FDDF2F;
 				}
 				
 				.collect {
-					background-color: #FDDF2F;
 					border-radius: 50rpx 0rpx 0rpx 50rpx;
 				}
 				
 				.buy {
-					background: #F76F7D;
 					border-radius: 0rpx 50rpx 50rpx 0rpx;
-					color: #FFFFFF;
 				}
 			}
 		}

@@ -1,7 +1,7 @@
 <template>
 	<view class="cate_wrap">
 		<view class="header_search">
-			<u-search input-align="center" bg-color="#FFFFFF" height="65" placeholder="输入您想要的商品或服务" v-model="searchData" @custom="search" @search="search"></u-search>
+			<u-search input-align="center" bg-color="#FFFFFF" height="75" placeholder="输入您想要的商品或服务" v-model="searchData" @custom="search" @search="search"></u-search>
 		</view>
 		<view class="content_wrap">
 			<!-- 左边的分类类别 -->
@@ -19,14 +19,14 @@
 					</view>
 					<view class="content_box" v-for="(item,index) in cate_detail" :key="item.id">
 						<view class="content_item" v-if="item.goods_category_id === subItem.id" @click="detail(item.id)">
-							<image style="width: 100%;height: 150rpx;border: 1rpx solid #b5b5b5;"
+							<image style="width: 100%;height: 220rpx;border: 1rpx solid #b5b5b5;"
 								:src="url + item.small_img_urls"></image>
 							<view class="goods_name">
 								{{ item.name }}
 							</view>
 							<view class="info">
 								<view class="price">
-									￥{{ item.price }}
+									￥{{ item.price || 0 }}
 								</view>
 								<view class="sale">
 									<text>已售:</text>
@@ -267,13 +267,16 @@
 						@include flex-col;
 						box-sizing: border-box;
 						float: left;
-						width: 33.3%;
+						width: 48%;
+						height: 360rpx;
 						padding: 10rpx 15rpx;
 						margin-bottom: 5rpx;
 					
 						.goods_name {
+							width: 240rpx;
+							height: 65rpx;
 							margin-top: 10rpx;
-							font-size: 20rpx;
+							font-size: 24rpx;
 							color: #656366;
 							letter-spacing: 1rpx;
 							@include clamp2;
@@ -288,12 +291,12 @@
 							.price {
 								color: red;
 								font-weight: 600;
-								font-size: 25rpx;
+								font-size: 28rpx;
 							}
 					
 							.sale {
 								@include flex-center;
-								font-size: 15rpx;
+								font-size: 20rpx;
 								color: $gray_color;
 							}
 						}
@@ -304,6 +307,11 @@
 	}
 	
 	.header_search {
+		position: sticky;
+		top: 0;
+		left: 0;
+		z-index: 999;
 		padding: 15rpx 20rpx;
+		background: #F2F2F2;
 	}
 </style>

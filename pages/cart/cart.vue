@@ -33,7 +33,7 @@
 
 		<none-data :text="'购物车暂无数据~'" v-else></none-data>
 
-		<view class="page-null"></view>
+		<view class="page-null" :style="{ height: is_lhp ? '230rpx' : '188rpx' }"></view>
 
 		<u-mask :show="showMask" @click="showMask = false">
 			<view class="warp flex flex_allcenter">
@@ -46,7 +46,7 @@
 			</view>
 		</u-mask>
 
-		<view class="container_bottom flex flex_between flex_middle">
+		<view class="container_bottom flex flex_between flex_middle" :style="{ bottom: is_lhp ? '140rpx' : '98rpx' }">
 			<view class="bottom_left flex flex_middle">
 				<view class="item_radio" :class="isAllRadio ? 'isRadio' : ''" @click="allRadioClick"></view>
 				<text>全选</text>
@@ -63,10 +63,10 @@
 				<view class="rect" @tap.stop>
 					<view class="info">
 						<view class="left">
-							<image :src="url + currentDetail.small_img_urls" style="width: 100%;height: 100%;"></image>
+							<image :src="currentDetail.currentModel == null ? url + currentDetail.small_img_urls : url + currentDetail.modelList[currentDetail.currentModel].model_img" style="width: 100%;height: 100%;" v-if="currentDetail.small_img_urls"></image>
 						</view>
 						<view class="right">
-							<view class="price">￥{{ currentDetail.price }}</view>
+							<view class="price">￥{{ currentDetail.currentModel == null ? currentDetail.price : currentDetail.modelList[currentDetail.currentModel].price }}</view>
 							<view class="select_type">
 								<text>已选择</text>
 								<text style="margin-left: 15rpx;">{{ currentDetail.currentModel!= null ? currentDetail.modelList[currentDetail.currentModel].name : '' }}</text>
@@ -77,7 +77,7 @@
 					<view class="model">
 						<view class="title">型号</view>
 						<view class="model_list">
-							<view class="model_item" :class="index === currentDetail.currentModel ? 'activeModel' : ''" v-for="(item, index) in currentDetail.modelList" :key="item.id" @click="chooseModel(item, index)">
+							<view class="model_item" :class="index === currentDetail.currentModel ? 'activeModel' : ''" v-for="(item, index) in currentDetail.modelList" :key="index" @click="chooseModel(item, index)">
 								{{ item.name }}
 							</view>
 						</view>
@@ -105,7 +105,6 @@
 			return {
 				isAllRadio: false, // 全选状态
 				isEdit: false, // 是否是编辑状态
-				userInfo: getApp().globalData.wxuser,
 				url: getApp().globalData.requesturl,
 				goodsList: [],
 				totalPrice: 0,
@@ -113,20 +112,24 @@
 				showMask: false,
 				showSelect: false,
 				currentDetail: {},
-				currentGoods: null
+				currentGoods: null,
+				is_lhp: false
 			}
 		},
 		components: {
 			noneData
 		},
-		onShow() {
-			this.goodsList = [];
-			this.isAllRadio = false;
-			this.totalPrice = 0;
-			this.totalQuantity = 0;
-			this.getCartList();
+		onLoad() {
+			this.is_lhp = this.$is_bang
 		},
 		methods: {
+			ontrueGetList() {
+				this.goodsList = [];
+				this.isAllRadio = false;
+				this.totalPrice = 0;
+				this.totalQuantity = 0;
+				this.getCartList();
+			},
 			// 当前编辑商品弹窗
 			async openPopup(goodsId, index) {
 				if (!this.isEdit) return;
@@ -168,13 +171,14 @@
 				if (!currentData.quantity) {
 					return getApp().globalData.global_Toast(true, "请选择型号数量", function(res) {})
 				}
+				let userInfo = uni.getStorageSync('wxuser')
 				let cartDetail = {
 					id: this.goodsList[this.currentGoods].id,
-					user_id: this.userInfo.id,
+					user_id: userInfo.id,
 					goods_id: currentData.id,
 					goods_name: currentData.name,
-					imgUrl: currentData.small_img_urls,
-					price: currentData.price,
+					imgUrl: currentData.modelList[currentData.currentModel].model_img,
+					price: currentData.modelList[currentData.currentModel].price,
 					goods_model: currentData.goods_model,
 					quantity: currentData.quantity,
 				}
@@ -187,7 +191,8 @@
 			},
 			// 获取购物车列表
 			async getCartList() {
-				const resData = await cartApi.cartList({ id: this.userInfo.id })
+				let userInfo = uni.getStorageSync('wxuser')
+				const resData = await cartApi.cartList({ id: userInfo.id })
 				if (resData.code === 200) {
 					if (resData.data.list.length > 0) {
 						resData.data.list.forEach(item => item.isRadio = false);
@@ -272,7 +277,7 @@
 				}
 				this.$store.commit("nextOrder", orderData);
 				setTimeout(() => {
-					uni.navigateTo({ url: "../order/order" })
+					uni.navigateTo({ url: "../../subPackages/order/order" })
 				}, 1000)
 			}
 		}
@@ -290,7 +295,6 @@
 
 	.page-null {
 		width: 100%;
-		height: 150rpx;
 	}
 
 	.container_top {
@@ -445,7 +449,6 @@
 		background: #FFFFFF;
 		position: fixed;
 		left: 0;
-		bottom: 0;
 	}
 
 	.bottom_left {

@@ -14,6 +14,7 @@
 			"path": "pages/index/index",
 			"style": {
 				// "navigationBarTitleText": "旋挖宝"
+				"enablePullDownRefresh": true
 			}
 		},
 		{
@@ -58,6 +59,24 @@
 			"path": "pages/user/order_center",
 			"style": {
 				"navigationBarTitleText": "订单中心",
+				"navigationBarBackgroundColor": "#FDDF2F"
+			}
+		}, {
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "用户登陆",
+				"navigationBarBackgroundColor": "#FDDF2F"
+			}
+		}, {
+			"path": "pages/user/certification",
+			"style": {
+				"navigationBarTitleText": "身份认证",
+				"navigationBarBackgroundColor": "#FDDF2F"
+			}
+		}, {
+			"path": "pages/cart/cart",
+			"style": {
+				"navigationBarTitleText": "购物车",
 				"navigationBarBackgroundColor": "#FDDF2F"
 			}
 		}
@@ -209,14 +228,6 @@
 					"navigationBarTitleText": "个人认证",
 					"navigationBarBackgroundColor": "#FDDF2F"
 				}
-			},
-			{
-				"path": "cart/cart",
-				"style": {
-					"navigationBarTitleText": "购物车",
-					"navigationBarBackgroundColor": "#FDDF2F",
-					"enablePullDownRefresh": false
-				}
 			}
 		]
 	}],
@@ -230,7 +241,7 @@
 		"current": 0,
 		"list": [{
 				"name": "购物车",
-				"path": "subPackages/cart/cart",
+				"path": "pages/cart/cart",
 				"query": ""
 			},
 			{
@@ -241,6 +252,16 @@
 			{
 				"name": "购买记录",
 				"path": "subPackages/user/userCenter/shoppingRecord",
+				"query": ""
+			},
+			{
+				"name": "用户登陆",
+				"path": "pages/login/login",
+				"query": ""
+			},
+			{
+				"name": "身份认证",
+				"path": "pages/user/certification",
 				"query": ""
 			}
 		]

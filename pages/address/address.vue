@@ -1,19 +1,25 @@
 <template>
 	<view class="container">
+		<view class="header_tab flex flex_space flex_middle">
+			<view class="tab_item flex flex_middle" v-for="(item, index) in tabList" :key="index" @click="selectTab(index)">
+				<image :src="index == tabIndex ? item.icon_s : item.icon"></image>
+				<text :class="index == tabIndex ? 'text_s' : ''">{{item.name}}</text>
+			</view>
+		</view>
 		<view v-if="addressList.length>0">
 			<view v-for="(item,index) in addressList"   class="address_list" 
 				:key="index"
 				@click="clickAddressItem(item)">
 				<view class="address_item">
-					<view class="address_label">收货人名字:</view>
+					<view class="address_label">收货人</view>
 					<view class="address_content">{{item.name}}</view>
 				</view>
 				<view class="address_item">
-					<view class="address_label">收货人电话:</view>
+					<view class="address_label">联系电话</view>
 					<view class="address_content">{{item.phone}}</view>
 				</view>
 				<view class="address_item">
-					<view class="address_label">收货人地址:</view>
+					<view class="address_label">收货地址</view>
 					<view class="address_area">{{item.region+item.detail}}</view>
 				</view>
 				<view class="btn_ctrl">
@@ -22,9 +28,12 @@
 						<view class="circle" v-else></view>
 						<text :class="item.def?'active':''">设为默认</text>
 					</view>
-					<view class="del_edit">
+					<view class="del_edit" v-if="tabIndex == 0">
 						<text  @click.stop="openDelete(item.id)">删除</text>
 						<text @click.stop="openEdit(item)">修改</text>
+					</view>
+					<view class="del_edit" v-else>
+						<text>{{item.project}}</text>
 					</view>
 				</view>
 			</view>
@@ -33,10 +42,11 @@
 		<view v-else class="none-data">
 			<u-empty text="收货地址为空" mode="address"></u-empty>
 		</view>
-
-		<view class="bottom" @click="addAddress">
-			<image src="../../static/user/add.png" class="add_icon"></image>
-			添加收货地址
+		
+		<view class="page-null" v-if="tabIndex == 0"></view>
+		
+		<view class="bottom_button flex flex_allcenter" v-if="tabIndex == 0">
+			<view class="button_add" @click="addAddress">添加收货地址</view>
 		</view>
 
 		<u-popup v-model="showAdd" mode="center" border-radius="10" width="650rpx" height="340px" class="dialog_wrap" @close="closePopup">
@@ -69,13 +79,10 @@
 			<view class="save_btn" @click="addSubmit">
 				<view class="btn" hover-class="save_hover">保存</view>
 			</view>
-		</u-popup>
-		
+		</u-popup>	
 
 		<u-picker mode="region" v-model="addressShow" :area-code='["11", "1101", "110101"]' @confirm="confirmAddress">
 		</u-picker>
-
-
 	</view>
 </template>
 
@@ -86,6 +93,17 @@
 	export default {
 		data() {
 			return {
+				tabIndex: 0,
+				tabList: [{
+					name: '自定义地址',
+					icon: '../../static/user/address.png',
+					icon_s: '../../static/user/address_s.png'
+				},
+				{
+					name: '系统地址',
+					icon: '../../static/user/system.png',
+					icon_s: '../../static/user/system_s.png'
+				}],
 				addressList: [],
 				showAdd: false,
 				addressShow: false, // 选择地区控件显示
@@ -111,15 +129,30 @@
 			});
 		},
 		methods: {
+			selectTab(index) {
+				this.tabIndex = index
+				this.getList()
+			},
 			getList() {
 				let query = {
 					user_id: this.wxuser.id,
 					page: 1,
 					pageSize: 99
 				}
-				addressApi.getAddressList(query).then(res => {
-					this.addressList = res.data.list
-				})
+				if (this.tabIndex == 0) {
+					addressApi.getAddressList(query).then(res => {
+						this.addressList = res.data.list
+					})
+				} else {
+					addressApi.getSystemAddress(query).then(res => {
+						this.addressList = res.data.list
+						this.addressList.forEach(item => {
+							item.name = this.wxuser.rname
+							item.phone = this.wxuser.phone
+							item.def = false
+						})
+					})
+				}
 			},
 			// 添加地址模态框
 			addAddress() {
@@ -338,22 +371,24 @@
 		// 列表
 		.address_list {
 			background-color: #FFFFFF;
-			padding: 30rpx 80rpx 100rpx 80rpx;
-			border-bottom: 3rpx solid #e3e3e3;
+			padding: 30rpx 80rpx;
+			border-bottom: 1px solid #e3e3e3;
 
 			.address_item {
 				display: flex;
 				margin: 20rpx 0;
 
 				.address_label {
-					width: 190rpx;
+					width: 160rpx;
 					font-size: 30rpx;
 					font-weight: bold;
 					color: #808080;
 				}
 
 				.address_area {
-					flex: 1;
+					width: 400rpx;
+					word-wrap:break-word;
+					word-break:normal; 
 				}
 			}
 
@@ -385,22 +420,6 @@
 				.active {
 					color: $page_color;
 				}
-			}
-		}
-
-		// 底部按钮
-		.bottom {
-			position: fixed;
-			bottom: 0;
-			width: 100%;
-			background-color: $page_color;
-			height: 90rpx;
-			@include flex-center;
-
-			.add_icon {
-				width: 40rpx;
-				height: 40rpx;
-				margin-right: 18rpx;
 			}
 		}
 
@@ -496,5 +515,51 @@
 			left: 50%;
 			transform: translateX(-50%);
 		}
+	}
+	
+	.header_tab {
+		width: 100%;
+		height: 100rpx;
+		background: #FFFFFF;
+		border-bottom: 1px solid #e3e3e3;
+		
+		.tab_item  {
+			color: #CCCCCC;
+			font-size: 30rpx;
+			
+			&>image {
+				margin-right: 10rpx;
+				width: 40rpx;
+				height: 40rpx;
+			}
+			
+			.text_s {
+				color: #000000;
+			}
+		}
+	}
+	
+	.bottom_button {
+		width: 100%;
+		height: 100rpx;
+		position: fixed;
+		left: 0;
+		bottom: 0;
+	}
+	
+	.button_add {
+		width: 85%;
+		height: 80rpx;
+		background: #FFDF2C;
+		text-align: center;
+		line-height: 80rpx;
+		border-radius: 50rpx;
+		font-size: 30rpx;
+		font-weight: bold;
+	}
+	
+	.page-null {
+		width: 100%;
+		height: 60rpx;
 	}
 </style>

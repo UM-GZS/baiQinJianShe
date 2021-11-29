@@ -17,9 +17,9 @@
 			</view>
 			<!-- 身份 -->
 			<view class="cell_row">
-				<view class="label" style="line-height: 60rpx;">身份:</view>
+				<view class="label" style="line-height: 60rpx;">职务:</view>
 				<view class="identity">
-					<text style="margin-right: 10rpx;">个人车主</text>
+					<text style="margin-right: 10rpx;">{{user.description}}</text>
 					<image src="../../static/user/success.png" style="width: 25rpx; height: 25rpx;"></image>
 				</view>
 			</view>

@@ -22,5 +22,7 @@ export default {
 	deleteAddress(data) {
 		return global_request('/api/address/delete',data,'POST',true);
 	},
-	
+	getSystemAddress(data) {
+		return global_request('/api/systemAddress/list',data,'GET',true);
+	},
 }
