@@ -7,7 +7,7 @@
 		<view class="container_box" v-if="goodsList.length > 0">
 			<view class="box_item flex flex_middle" v-for="(item, index) in goodsList" :key="index">
 				<view class="item_radio" :class="item.isRadio ? 'isRadio' : ''" @click="radioClick(index)"></view>
-				<view class="item_image">
+				<view class="item_image" @click="radioClick(index)">
 					<image :src="url + item.img_url"></image>
 				</view>
 				<view class="item_info">
@@ -302,9 +302,9 @@
 		height: 80rpx;
 
 		.top_edit {
-			width: 100rpx;
-			height: 50rpx;
-			line-height: 50rpx;
+			width: 110rpx;
+			height: 60rpx;
+			line-height: 60rpx;
 			text-align: center;
 			border-radius: 50rpx;
 			background: #FFDF2C;
@@ -477,9 +477,9 @@
 
 		.right_settlement {
 			margin-left: 20rpx;
-			width: 210rpx;
-			height: 70rpx;
-			line-height: 68rpx;
+			width: 220rpx;
+			height: 80rpx;
+			line-height: 80rpx;
 			background: #FFDF2C;
 			text-align: center;
 			font-size: 30rpx;

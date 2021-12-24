@@ -94,10 +94,10 @@
 		
 		.login_button {
 			width: 80%;
-			height: 80rpx;
+			height: 90rpx;
 			background: #FEDE34;
 			text-align: center;
-			line-height: 80rpx;
+			line-height: 90rpx;
 			border-radius: 50rpx;
 			font-size: 30rpx;
 			font-weight: bold;

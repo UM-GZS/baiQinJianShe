@@ -681,7 +681,7 @@
 				.next_step {
 					margin: 30rpx auto;
 					width: 80%;
-					height: 60rpx;
+					height: 80rpx;
 					background-color: $page_color;
 					border-radius: 50rpx;
 					@include flex-center;

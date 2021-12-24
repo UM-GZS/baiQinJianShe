@@ -123,6 +123,7 @@
 			if (currentPage.location) {
 				this.locName = currentPage.location;
 			}
+			if (this.show_index == 1) this.$refs.cart.ontrueGetList()
 		},
 		methods: {
 			//! 判断用户是否授权获取地理位置

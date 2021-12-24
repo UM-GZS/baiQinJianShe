@@ -49,7 +49,7 @@
 			<view class="button_add" @click="addAddress">添加收货地址</view>
 		</view>
 
-		<u-popup v-model="showAdd" mode="center" border-radius="10" width="650rpx" height="340px" class="dialog_wrap" @close="closePopup">
+		<u-popup v-model="showAdd" mode="center" border-radius="10" width="650rpx" height="360px" class="dialog_wrap" @close="closePopup">
 			<view class="label">添加收货地址</view>
 			<view class="cell_row">
 				<text>收货人:</text>
@@ -74,7 +74,7 @@
 				</view>
 			</view>
 			<view class="default_set">
-				<u-checkbox v-model="addData.isDefault" shape="circle">设为默认</u-checkbox>
+				<u-checkbox v-model="addData.def" shape="circle">设为默认</u-checkbox>
 			</view>
 			<view class="save_btn" @click="addSubmit">
 				<view class="btn" hover-class="save_hover">保存</view>
@@ -494,7 +494,7 @@
 				bottom: 30rpx;
 
 				.btn {
-					padding: 10rpx 0;
+					padding: 15rpx 0;
 					width: 60%;
 					height: 100%;
 					background-color: $page_color;
@@ -549,10 +549,10 @@
 	
 	.button_add {
 		width: 85%;
-		height: 80rpx;
+		height: 90rpx;
 		background: #FFDF2C;
 		text-align: center;
-		line-height: 80rpx;
+		line-height: 90rpx;
 		border-radius: 50rpx;
 		font-size: 30rpx;
 		font-weight: bold;
